@@ -1,0 +1,3 @@
+[submodule "Submodules/Zenject"]
+	path = Submodules/Zenject
+	url = git@github.com:vovo-8112/Zenject.git

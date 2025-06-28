@@ -25,9 +25,7 @@ public class GridManager : MonoBehaviour
             for (int y = 0; y < gridSize; y++)
             {
                 var cell = Instantiate(cellPrefab, gridParent);
-                cell.x = x;
-                cell.y = y;
-
+                cell.Setup(x, y);
                 cells.Add(cell);
 
                 int iconIndex = (x + y) % 2;

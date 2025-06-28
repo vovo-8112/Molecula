@@ -4,3 +4,6 @@
 [submodule "Assets/Submodules/Initialization"]
 	path = Assets/Submodules/Initialization
 	url = git@github.com:vovo-8112/Initialization.git
+[submodule "Assets/Submodules/DOTween"]
+	path = Assets/Submodules/DOTween
+	url = git@github.com:vovo-8112/DOTween.git

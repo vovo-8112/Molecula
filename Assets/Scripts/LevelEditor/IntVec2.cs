@@ -4,7 +4,7 @@ using UnityEngine;
 namespace LevelEditor
 {
     [Serializable]
-    public struct IntVec2 
+    public struct IntVec2 : IEquatable<IntVec2>
     {
         public int x;
         public int y;

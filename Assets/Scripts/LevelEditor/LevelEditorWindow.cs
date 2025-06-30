@@ -12,8 +12,8 @@ using UnityEngine;
 public class LevelEditorWindow : EditorWindow
 {
     private LevelData levelData;
-    private int cellSize = 30;
-    private CellConfig _config;
+    [SerializeField] private int cellSize = 50;
+    private CellConfig _cellConfig;
     private string currentId = "";
 
     [MenuItem("Tools/Level Editor")]
@@ -29,7 +29,7 @@ public class LevelEditorWindow : EditorWindow
         DrawTopMenuButtons();
 
         InitializeCellConfigDatabase();
-        if (_config == null || _config.configs.Count == 0)
+        if (_cellConfig == null || _cellConfig.configs.Count == 0)
         {
             EditorGUILayout.HelpBox("CellConfigDatabase not set!", MessageType.Warning);
             return;
@@ -63,14 +63,24 @@ public class LevelEditorWindow : EditorWindow
             string path = EditorUtility.OpenFilePanel("Open Level JSON", "", "json");
             if (!string.IsNullOrEmpty(path))
             {
-                string json = File.ReadAllText(path, Encoding.UTF8);
-                var loadedCells = JsonConvert.DeserializeObject<List<CellData>>(json);
-                levelData = new LevelData
+                try
                 {
-                    cells = loadedCells ?? new List<CellData>(),
-                    gridSize = new IntVec2(8, 8),
-                    score = 0
-                };
+                    string json = File.ReadAllText(path, Encoding.UTF8);
+                    var deserializeLevelData = JsonConvert.DeserializeObject<LevelData>(json);
+                    if (deserializeLevelData == null)
+                        throw new System.Exception("Deserialized levelData is null.");
+                    levelData = deserializeLevelData;
+                    Repaint();
+                    EditorApplication.delayCall += () => {
+                        Focus();
+                        Repaint();
+                    };
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError("Failed to load level: " + ex);
+                    EditorUtility.DisplayDialog("Error", "Не вдалося завантажити JSON:\n" + ex.Message, "OK");
+                }
             }
         }
 
@@ -80,18 +90,18 @@ public class LevelEditorWindow : EditorWindow
     private void InitializeCellConfigDatabase()
     {
         // Auto-find CellConfigDatabase asset if not set
-        if (_config == null)
+        if (_cellConfig == null)
         {
-            string[] guids = AssetDatabase.FindAssets($"t:CellConfig1");
+            string[] guids = AssetDatabase.FindAssets($"t:CellConfig");
             if (guids.Length > 0)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guids[0]);
-                _config = AssetDatabase.LoadAssetAtPath<CellConfig>(path);
+                _cellConfig = AssetDatabase.LoadAssetAtPath<CellConfig>(path);
             }
         }
 
-        _config =
-            (CellConfig)EditorGUILayout.ObjectField("Config DB", _config, typeof(CellConfig),
+        _cellConfig =
+            (CellConfig)EditorGUILayout.ObjectField("Config DB", _cellConfig, typeof(CellConfig),
                 false);
     }
 
@@ -112,9 +122,8 @@ public class LevelEditorWindow : EditorWindow
     {
         GUILayout.Label("Select Brush (Cell):", EditorStyles.boldLabel);
 
-        int columns = 5;
-        int size = 48;
-        int rows = Mathf.CeilToInt(_config.configs.Count / (float)columns);
+        int columns = Mathf.Max(1, Mathf.FloorToInt(EditorGUIUtility.currentViewWidth / (cellSize + 10)));
+        int rows = Mathf.CeilToInt(_cellConfig.configs.Count / (float)columns);
 
         for (int row = 0; row < rows; row++)
         {
@@ -122,16 +131,16 @@ public class LevelEditorWindow : EditorWindow
             for (int col = 0; col < columns; col++)
             {
                 int i = row * columns + col;
-                if (i >= _config.configs.Count) break;
+                if (i >= _cellConfig.configs.Count) break;
 
-                var cell = _config.configs[i];
+                var cell = _cellConfig.configs[i];
                 Texture2D preview = cell.sprite != null
                     ? AssetPreview.GetAssetPreview(cell.sprite)
                     : Texture2D.whiteTexture;
                 GUIContent content = new GUIContent(preview, cell.cellId);
 
                 GUIStyle style = GUI.skin.button;
-                if (GUILayout.Button(content, style, GUILayout.Width(size), GUILayout.Height(size)))
+                if (GUILayout.Button(content, style, GUILayout.Width(cellSize), GUILayout.Height(cellSize)))
                 {
                     currentId = cell.cellId;
                 }
@@ -166,6 +175,7 @@ public class LevelEditorWindow : EditorWindow
                 levelData.cells.Clear();
                 levelData.score = 0;
                 levelData.gridSize = new IntVec2(8, 8);
+                levelData.levelId = string.Empty;
             }
         }
     }
@@ -192,9 +202,9 @@ public class LevelEditorWindow : EditorWindow
         CellData cell = levelData.GetCell(pos);
         Color color = Color.black;
 
-        if (_config != null && cell != null)
+        if (_cellConfig != null && cell != null)
         {
-            var config = _config.Get(cell.cellId);
+            var config = _cellConfig.Get(cell.cellId);
             if (config?.sprite != null)
             {
                 GUI.DrawTexture(cellRect, config.sprite.texture, ScaleMode.ScaleToFit);
@@ -216,7 +226,7 @@ public class LevelEditorWindow : EditorWindow
 
     private void ToggleCell(Vector2Int pos)
     {
-        var config = _config.Get(currentId);
+        var config = _cellConfig.Get(currentId);
         if (config == null) return;
 
         CellData cell = levelData.GetCell(pos);

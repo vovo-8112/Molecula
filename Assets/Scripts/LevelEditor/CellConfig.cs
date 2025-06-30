@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Game/Cell Config Database")]
-public class CellConfigDatabase : ScriptableObject
+[CreateAssetMenu(menuName = "Game/CellConfig")]
+public class CellConfig : ScriptableObject
 {
     public List<CellData> configs;
 

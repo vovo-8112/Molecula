@@ -1,12 +1,14 @@
+using System;
 using System.Collections.Generic;
 using LevelEditor;
-using UnityEngine;
 
-[CreateAssetMenu(menuName = "Game/Level Data")]
-public class LevelData : ScriptableObject
+[Serializable]
+public class LevelData
 {
-    public List<CellData> cells = new();
     public IntVec2 gridSize;
+    public int score;
+    public string levelId;
+    public List<CellData> cells = new();
 
     public CellData GetCell(IntVec2 position)
     {

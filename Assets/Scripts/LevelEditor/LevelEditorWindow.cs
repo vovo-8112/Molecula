@@ -31,14 +31,38 @@ public class LevelEditorWindow : EditorWindow
 
         if (configDatabase == null || configDatabase.configs.Count == 0)
         {
-            EditorGUILayout.HelpBox("CellConfigDatabase не задано!", MessageType.Warning);
+            EditorGUILayout.HelpBox("CellConfigDatabase not set!", MessageType.Warning);
             return;
         }
 
-        var allIds = configDatabase.GetAllIds();
-        int selectedIndex = Mathf.Max(0, allIds.IndexOf(currentId));
-        selectedIndex = EditorGUILayout.Popup("Brush ID", selectedIndex, allIds.ToArray());
-        currentId = allIds[selectedIndex];
+        GUILayout.Label("Select Brush (Cell):", EditorStyles.boldLabel);
+
+        int columns = 5;
+        int size = 48;
+        int rows = Mathf.CeilToInt(configDatabase.configs.Count / (float)columns);
+
+        for (int row = 0; row < rows; row++)
+        {
+            EditorGUILayout.BeginHorizontal();
+            for (int col = 0; col < columns; col++)
+            {
+                int i = row * columns + col;
+                if (i >= configDatabase.configs.Count) break;
+
+                var cell = configDatabase.configs[i];
+                Texture2D preview = cell.sprite != null ? AssetPreview.GetAssetPreview(cell.sprite) : Texture2D.whiteTexture;
+                GUIContent content = new GUIContent(preview, cell.cellId);
+
+                GUIStyle style = GUI.skin.button;
+                if (GUILayout.Button(content, style, GUILayout.Width(size), GUILayout.Height(size)))
+                {
+                    currentId = cell.cellId;
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        GUILayout.Label("Current Brush: " + currentId);
         levelData.gridSize = new IntVec2(
             EditorGUILayout.IntField("Grid Width", levelData.gridSize.x),
             EditorGUILayout.IntField("Grid Height", levelData.gridSize.y)

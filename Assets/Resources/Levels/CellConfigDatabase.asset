@@ -10,21 +10,31 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 844e5ee49f71475780098fb383e1e806, type: 3}
-  m_Name: New Cell Config Database
+  m_Name: CellConfigDatabase
   m_EditorClassIdentifier: 
   configs:
   - cellId: empty
-    position: {x: 0, y: 0}
+    position:
+      x: 0
+      y: 0
     sprite: {fileID: 0}
   - cellId: blocker
-    position: {x: 0, y: 0}
-    sprite: {fileID: 21300000, guid: 8af7f7da9209c45598c2034865aea01c, type: 3}
+    position:
+      x: 0
+      y: 0
+    sprite: {fileID: 21300000, guid: 9e1d77e107b614ae9be157429a65de67, type: 3}
   - cellId: blue
-    position: {x: 0, y: 0}
+    position:
+      x: 0
+      y: 0
     sprite: {fileID: 21300000, guid: 0a3d05ad0128046b38d3ba4a8dac46ea, type: 3}
   - cellId: green
-    position: {x: 0, y: 0}
+    position:
+      x: 0
+      y: 0
     sprite: {fileID: 21300000, guid: 92603dda54c8e4912988550d2e890410, type: 3}
   - cellId: purple
-    position: {x: 0, y: 0}
+    position:
+      x: 0
+      y: 0
     sprite: {fileID: 21300000, guid: 5deeb243067ca48feb0ece0b05e49b7f, type: 3}
